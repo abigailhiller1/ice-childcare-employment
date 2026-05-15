@@ -6,12 +6,12 @@
 <title>ICE enforcement and childcare employment, by setting</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: #ffffff; }
   body {
-    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
     color: #0f172a;
     padding: 20px 18px 16px;
     font-size: 14px;
@@ -24,27 +24,29 @@
   }
   .es-wrap { position: relative; max-width: 720px; margin: 0 auto; }
   .es-title {
-    font-size: 16px; font-weight: 600; color: #0f172a;
-    margin-bottom: 2px;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 20px; font-weight: 500; color: #0f172a;
+    line-height: 1.3; margin-bottom: 16px;
+    letter-spacing: -0.005em;
   }
-  .es-subtitle {
-    font-size: 13px; font-weight: 400; color: #475569;
-    margin-bottom: 16px;
-  }
-  .es-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .es-pill {
+  .es-legend { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-bottom: 14px; }
+  .es-legend-item {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 5px 11px; background: #ffffff;
-    border: 1px solid #e2e8f0; border-radius: 6px;
+    background: none; border: none; padding: 4px 0;
     font-family: inherit; font-size: 13px;
-    cursor: pointer; color: #0f172a;
-    transition: background-color 0.12s, border-color 0.12s;
+    cursor: pointer; color: #64748b;
+    border-bottom: 1.5px solid transparent;
+    transition: color 0.12s, border-color 0.12s;
   }
-  .es-pill:hover { background: #f8fafc; border-color: #cbd5e1; }
-  .es-pill.active {
-    border-color: #475569; background: #f1f5f9; font-weight: 500;
+  .es-legend-item:hover { color: #0f172a; border-bottom-color: #cbd5e1; }
+  .es-legend-item.active {
+    color: var(--c);
+    font-weight: 500;
   }
-  .es-swatch { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+  .es-rule {
+    display: inline-block; width: 20px; height: 2px;
+    background: var(--c); flex-shrink: 0;
+  }
   .es-svg-box { position: relative; width: 100%; }
   .es-svg-box svg { width: 100%; height: auto; display: block; overflow: visible; }
   .es-tip {
@@ -64,8 +66,8 @@
   .es-source { font-size: 11px; color: #94a3b8; margin-top: 8px; }
   @media (max-width: 500px) {
     body { padding: 14px 12px; font-size: 13px; }
-    .es-title { font-size: 15px; }
-    .es-pill { font-size: 12px; padding: 4px 9px; }
+    .es-title { font-size: 17px; }
+    .es-legend-item { font-size: 12px; }
   }
 </style>
 </head>
@@ -74,14 +76,13 @@
 <h1 class="sr-only">Event-study: ICE enforcement and foreign-born women's childcare employment, by setting</h1>
 
 <div class="es-wrap">
-  <div class="es-title">Foreign-born women's childcare employment, by setting</div>
-  <div class="es-subtitle">Event-study estimates around Trump's January 2025 inauguration. Click a setting to highlight its 95% confidence interval.</div>
+  <div class="es-title">Change in foreign-born childcare employment, by setting</div>
 
   <div class="es-legend" role="group" aria-label="Select a childcare setting to highlight">
-    <button class="es-pill" data-key="any_cc2"><span class="es-swatch" style="background:#71717A"></span>Any childcare</button>
-    <button class="es-pill active" data-key="center_cc"><span class="es-swatch" style="background:#6B5BCD"></span>Center-based</button>
-    <button class="es-pill" data-key="home_cc"><span class="es-swatch" style="background:#0F766E"></span>Home-based</button>
-    <button class="es-pill" data-key="private_cc"><span class="es-swatch" style="background:#C2410C"></span>Private household</button>
+    <button class="es-legend-item" data-key="any_cc2" style="--c: #6F6F73"><span class="es-rule"></span>Any Childcare</button>
+    <button class="es-legend-item active" data-key="center_cc" style="--c: #00356B"><span class="es-rule"></span>Center-Based Care</button>
+    <button class="es-legend-item" data-key="home_cc" style="--c: #B58A2E"><span class="es-rule"></span>Home-Based Care</button>
+    <button class="es-legend-item" data-key="private_cc" style="--c: #9B2335"><span class="es-rule"></span>Private Care</button>
   </div>
 
   <div class="es-svg-box">
@@ -92,14 +93,11 @@
   <div class="es-note">
     Each point is the estimated change in employment probability for foreign-born women per 1 SD increase in state-level ICE enforcement intensity. Month 0 is February 2025, the first full month after Trump's inauguration; month -1 (January 2025) is the omitted reference period. The earliest bin consolidates all leads at month -9 or earlier. Shaded band = 95% confidence interval for the highlighted setting.
   </div>
-  <div class="es-source">
-    Source: Aslim, Currie, Herbst &amp; Tekin (2026), based on Current Population Survey and Deportation Data Project, September 2023–September 2025.
-  </div>
 </div>
 
 <script>
 const series = [
-  { key: "any_cc2", label: "Any childcare", color: "#71717A", points: [
+  { key: "any_cc2", label: "Any Childcare", color: "#6F6F73", points: [
     {t:-9,coef:-0.00124,lo:-0.00709,hi:0.00462},{t:-8,coef:0.00376,lo:-0.00476,hi:0.01227},
     {t:-7,coef:0.00386,lo:-0.00654,hi:0.01426},{t:-6,coef:-0.0008,lo:-0.00934,hi:0.00773},
     {t:-5,coef:-0.00076,lo:-0.00836,hi:0.00685},{t:-4,coef:-0.00054,lo:-0.007,hi:0.00592},
@@ -110,7 +108,7 @@ const series = [
     {t:5,coef:-0.00532,lo:-0.01294,hi:0.0023},{t:6,coef:-0.01268,lo:-0.01928,hi:-0.00608},
     {t:7,coef:-0.00663,lo:-0.01458,hi:0.00133}
   ]},
-  { key: "center_cc", label: "Center-based", color: "#6B5BCD", points: [
+  { key: "center_cc", label: "Center-Based Care", color: "#00356B", points: [
     {t:-9,coef:-0.00381,lo:-0.00853,hi:0.0009},{t:-8,coef:0.00033,lo:-0.00597,hi:0.00663},
     {t:-7,coef:0.00116,lo:-0.00649,hi:0.00882},{t:-6,coef:0.0003,lo:-0.00552,hi:0.00613},
     {t:-5,coef:-0.00028,lo:-0.00641,hi:0.00586},{t:-4,coef:-0.00204,lo:-0.0084,hi:0.00432},
@@ -121,7 +119,7 @@ const series = [
     {t:5,coef:-0.00837,lo:-0.01351,hi:-0.00323},{t:6,coef:-0.01209,lo:-0.01895,hi:-0.00523},
     {t:7,coef:-0.00869,lo:-0.01506,hi:-0.00231}
   ]},
-  { key: "home_cc", label: "Home-based", color: "#0F766E", points: [
+  { key: "home_cc", label: "Home-Based Care", color: "#B58A2E", points: [
     {t:-9,coef:0.00373,lo:0.00078,hi:0.00667},{t:-8,coef:0.00242,lo:-0.00074,hi:0.00559},
     {t:-7,coef:0.00375,lo:0.00049,hi:0.00702},{t:-6,coef:0.00154,lo:-0.00302,hi:0.00609},
     {t:-5,coef:0.00148,lo:-0.002,hi:0.00495},{t:-4,coef:0.00197,lo:0.0002,hi:0.00375},
@@ -132,7 +130,7 @@ const series = [
     {t:5,coef:0.00092,lo:-0.00359,hi:0.00543},{t:6,coef:-0.00134,lo:-0.00597,hi:0.00329},
     {t:7,coef:0.00176,lo:-0.00113,hi:0.00465}
   ]},
-  { key: "private_cc", label: "Private household", color: "#C2410C", points: [
+  { key: "private_cc", label: "Private Care", color: "#9B2335", points: [
     {t:-9,coef:-0.00115,lo:-0.00313,hi:0.00082},{t:-8,coef:0.001,lo:-0.00272,hi:0.00472},
     {t:-7,coef:-0.00106,lo:-0.00408,hi:0.00197},{t:-6,coef:-0.00264,lo:-0.00584,hi:0.00056},
     {t:-5,coef:-0.00196,lo:-0.00564,hi:0.00173},{t:-4,coef:-0.00048,lo:-0.00296,hi:0.002},
@@ -171,18 +169,17 @@ function el(tag, attrs, text) {
 function render() {
   svg.innerHTML = "";
 
+  svg.appendChild(el("line", {
+    x1: M.left, x2: M.left + PW, y1: ys(0), y2: ys(0),
+    stroke: "#cbd5e1", "stroke-width": 1
+  }));
+
   const yTicks = [-0.02, -0.015, -0.01, -0.005, 0, 0.005, 0.01, 0.015];
   for (const yt of yTicks) {
-    svg.appendChild(el("line", {
-      x1: M.left, x2: M.left + PW, y1: ys(yt), y2: ys(yt),
-      stroke: yt === 0 ? "#475569" : "#e2e8f0",
-      "stroke-width": yt === 0 ? 1 : 0.75,
-      "stroke-dasharray": yt === 0 ? "0" : "3,3"
-    }));
     svg.appendChild(el("text", {
       x: M.left - 8, y: ys(yt) + 4, "text-anchor": "end",
-      style: "font: 11px 'IBM Plex Sans', sans-serif; fill: #64748b; font-variant-numeric: tabular-nums;"
-    }, yt.toFixed(3)));
+      style: "font: 11px 'Source Sans 3', sans-serif; fill: #64748b; font-variant-numeric: tabular-nums;"
+    }, (yt * 100).toFixed(1)));
   }
 
   const eventX = (xs(-1) + xs(0)) / 2;
@@ -192,7 +189,7 @@ function render() {
   }));
   svg.appendChild(el("text", {
     x: eventX + 5, y: M.top + 11,
-    style: "font: 500 11px 'IBM Plex Sans', sans-serif; fill: #475569;"
+    style: "font: 500 11px 'Source Sans 3', sans-serif; fill: #475569;"
   }, "Trump inauguration"));
 
   for (let t = xMin; t <= xMax; t++) {
@@ -201,23 +198,23 @@ function render() {
       stroke: "#94a3b8", "stroke-width": 0.5, opacity: 0.7
     }));
   }
-  const xLabels = [{v:-9,t:"≤-9"},{v:-6,t:"-6"},{v:-3,t:"-3"},{v:-1,t:"-1 (ref)"},{v:0,t:"0"},{v:3,t:"3"},{v:6,t:"6"}];
+  const xLabels = [{v:-9,t:"≤-9"},{v:-6,t:"-6"},{v:-3,t:"-3"},{v:-1,t:"-1"},{v:0,t:"0"},{v:3,t:"3"},{v:6,t:"6"}];
   for (const xl of xLabels) {
     svg.appendChild(el("text", {
       x: xs(xl.v), y: M.top + PH + 18, "text-anchor": "middle",
-      style: "font: 11px 'IBM Plex Sans', sans-serif; fill: #64748b; font-variant-numeric: tabular-nums;"
+      style: "font: 11px 'Source Sans 3', sans-serif; fill: #64748b; font-variant-numeric: tabular-nums;"
     }, xl.t));
   }
   svg.appendChild(el("text", {
     x: M.left + PW / 2, y: M.top + PH + 40, "text-anchor": "middle",
-    style: "font: 12px 'IBM Plex Sans', sans-serif; fill: #475569;"
-  }, "Months relative to event (Feb 2025 = 0)"));
+    style: "font: 12px 'Source Sans 3', sans-serif; fill: #475569;"
+  }, "Months relative to Trump's inauguration"));
   svg.appendChild(el("text", {
     x: 12, y: M.top + PH / 2,
-    style: "font: 12px 'IBM Plex Sans', sans-serif; fill: #475569;",
+    style: "font: 12px 'Source Sans 3', sans-serif; fill: #475569;",
     transform: `rotate(-90, 12, ${M.top + PH / 2})`,
     "text-anchor": "middle"
-  }, "Coefficient (per 1 SD shock)"));
+  }, "Estimated change in employment probability (percentage points)"));
 
   for (const s of series) {
     if (s.key !== active) continue;
@@ -248,6 +245,15 @@ function render() {
       "stroke-linecap": "round", "stroke-linejoin": "round",
       "pointer-events": "none"
     }));
+    const hitPath = el("path", {
+      d: path, fill: "none", stroke: "transparent",
+      "stroke-width": 14,
+      "stroke-linecap": "round", "stroke-linejoin": "round",
+      style: "cursor: pointer;",
+      "pointer-events": "stroke"
+    });
+    hitPath.addEventListener("click", () => setActive(s.key));
+    svg.appendChild(hitPath);
   }
 
   for (const s of series) {
@@ -261,8 +267,8 @@ function render() {
       });
       dot.addEventListener("mouseenter", () => {
         tip.innerHTML = `<div class="es-tip-title">${s.label} · month ${p.t}</div>
-          <div class="es-tip-row">Estimate: ${p.coef.toFixed(4)}</div>
-          <div class="es-tip-row">95% CI: [${p.lo.toFixed(4)}, ${p.hi.toFixed(4)}]</div>`;
+          <div class="es-tip-row">Estimate: ${(p.coef * 100).toFixed(2)} pp</div>
+          <div class="es-tip-row">95% CI: [${(p.lo * 100).toFixed(2)}, ${(p.hi * 100).toFixed(2)}] pp</div>`;
         const wrap = svg.parentElement;
         const wrapRect = wrap.getBoundingClientRect();
         const svgRect = svg.getBoundingClientRect();
@@ -275,6 +281,7 @@ function render() {
         tip.style.opacity = 1;
       });
       dot.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
+      dot.addEventListener("click", () => setActive(s.key));
       svg.appendChild(dot);
     }
     if (active === s.key || active === null) {
@@ -286,18 +293,32 @@ function render() {
   }
 }
 
-document.querySelectorAll(".es-pill").forEach(pill => {
-  pill.addEventListener("click", () => {
-    const key = pill.dataset.key;
-    active = (active === key) ? null : key;
-    document.querySelectorAll(".es-pill").forEach(p => {
-      p.classList.toggle("active", p.dataset.key === active);
-    });
-    render();
+function setActive(key) {
+  active = (active === key) ? null : key;
+  document.querySelectorAll(".es-legend-item").forEach(p => {
+    p.classList.toggle("active", p.dataset.key === active);
   });
+  render();
+}
+
+document.querySelectorAll(".es-legend-item").forEach(pill => {
+  pill.addEventListener("click", () => setActive(pill.dataset.key));
 });
 
 render();
+
+function broadcastHeight() {
+  const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: "bfi-embed-height", id: "ice-childcare-employment", height: h }, "*");
+  }
+}
+window.addEventListener("load", broadcastHeight);
+window.addEventListener("resize", broadcastHeight);
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(broadcastHeight);
+}
+new ResizeObserver(broadcastHeight).observe(document.body);
 </script>
 </body>
 </html>
