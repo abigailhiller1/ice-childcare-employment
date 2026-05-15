@@ -56,8 +56,20 @@
     opacity: 0; transition: opacity 0.1s; z-index: 10; min-width: 170px;
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
   }
-  .es-tip-title { font-weight: 500; margin-bottom: 3px; color: #0f172a; }
+  .es-tip-title { font-weight: 500; margin-bottom: 4px; color: #0f172a; }
   .es-tip-row { color: #475569; font-variant-numeric: tabular-nums; }
+  .es-tip-multi {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 1px 0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .es-tip-swatch { width: 12px; height: 2px; border-radius: 1px; }
+  .es-tip-name { font-weight: 500; }
+  .es-tip-num { font-variant-numeric: tabular-nums; color: #475569; }
   .es-dot { cursor: pointer; }
   .es-readout {
     display: none;
@@ -290,15 +302,6 @@ function render() {
       "stroke-linecap": "round", "stroke-linejoin": "round",
       "pointer-events": "none"
     }));
-    const hitPath = el("path", {
-      d: path, fill: "none", stroke: "transparent",
-      "stroke-width": 14,
-      "stroke-linecap": "round", "stroke-linejoin": "round",
-      style: "cursor: pointer;",
-      "pointer-events": "stroke"
-    });
-    hitPath.addEventListener("click", () => setActive(s.key));
-    svg.appendChild(hitPath);
   }
 
   for (const s of series) {
@@ -306,48 +309,141 @@ function render() {
     const op = active === null ? 0.78 : (isActive ? 1 : 0.16);
     for (const p of s.points) {
       if (p.t === -1) continue;
-      const dot = el("circle", {
+      svg.appendChild(el("circle", {
         cx: xs(p.t), cy: ys(p.coef), r: isActive ? 3.5 : 2.5,
-        fill: s.color, opacity: op, class: "es-dot"
-      });
-      dot.addEventListener("mouseenter", () => {
-        tip.innerHTML = `<div class="es-tip-title">${s.label} \u00b7 ${tipTimeLabel(p.t)}</div>
-          <div class="es-tip-row">${tipFmt(p.coef)} pp (95% CI: ${tipFmt(p.lo)} to ${tipFmt(p.hi)})</div>`;
-        const wrap = svg.parentElement;
-        const wrapRect = wrap.getBoundingClientRect();
-        const svgRect = svg.getBoundingClientRect();
-        const scaleX = svgRect.width / W;
-        const scaleY = svgRect.height / H;
-        const cx = xs(p.t) * scaleX + (svgRect.left - wrapRect.left);
-        const cy = ys(p.coef) * scaleY + (svgRect.top - wrapRect.top);
-        const tipRect = tip.getBoundingClientRect();
-        const tipW = tipRect.width || 200;
-        const tipH = tipRect.height || 56;
-        const containerW = wrapRect.width;
-        let left = cx + 12;
-        let top = cy - tipH - 4;
-        if (left + tipW > containerW - 8) left = cx - 12 - tipW;
-        if (left < 8) left = 8;
-        if (top < 4) top = cy + 16;
-        tip.style.left = left + "px";
-        tip.style.top = top + "px";
-        tip.style.opacity = 1;
-        updateReadout(s, p);
-      });
-      dot.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
-      dot.addEventListener("click", () => {
-        updateReadout(s, p);
-        setActive(s.key);
-      });
-      svg.appendChild(dot);
+        fill: s.color, opacity: op, "pointer-events": "none"
+      }));
     }
     if (active === s.key || active === null) {
       svg.appendChild(el("circle", {
         cx: xs(-1), cy: ys(0), r: isActive ? 3.5 : 2.5,
-        fill: "#ffffff", stroke: s.color, "stroke-width": 1.5, opacity: op
+        fill: "#ffffff", stroke: s.color, "stroke-width": 1.5, opacity: op,
+        "pointer-events": "none"
       }));
     }
   }
+
+  const guide = el("line", {
+    x1: M.left, x2: M.left, y1: M.top, y2: M.top + PH,
+    stroke: "#94a3b8", "stroke-width": 1, "stroke-dasharray": "3,3",
+    opacity: 0, "pointer-events": "none"
+  });
+  svg.appendChild(guide);
+
+  const focusDots = [];
+  for (const s of series) {
+    const d = el("circle", {
+      cx: -10, cy: -10, r: 4.5,
+      fill: "#ffffff", stroke: s.color, "stroke-width": 2,
+      opacity: 0, "pointer-events": "none"
+    });
+    svg.appendChild(d);
+    focusDots.push({ key: s.key, el: d });
+  }
+
+  const overlay = el("rect", {
+    x: M.left, y: M.top, width: PW, height: PH,
+    fill: "transparent",
+    style: "cursor: crosshair;"
+  });
+  svg.appendChild(overlay);
+
+  function clientToViewBox(clientX, clientY) {
+    const r = svg.getBoundingClientRect();
+    const scale = r.width / W;
+    return { x: (clientX - r.left) / scale, y: (clientY - r.top) / scale };
+  }
+
+  function snapT(clientX) {
+    const { x } = clientToViewBox(clientX, 0);
+    const tFloat = ((x - M.left) / PW) * (xMax - xMin) + xMin;
+    return Math.max(xMin, Math.min(xMax, Math.round(tFloat)));
+  }
+
+  function showAtT(t, clientX, clientY) {
+    guide.setAttribute("x1", xs(t));
+    guide.setAttribute("x2", xs(t));
+    guide.setAttribute("opacity", 0.45);
+
+    for (const fd of focusDots) {
+      const s = series.find(ss => ss.key === fd.key);
+      const p = s.points.find(pt => pt.t === t);
+      const show = p && t !== -1 && (active === null || active === s.key);
+      if (show) {
+        fd.el.setAttribute("cx", xs(p.t));
+        fd.el.setAttribute("cy", ys(p.coef));
+        fd.el.setAttribute("opacity", 1);
+      } else {
+        fd.el.setAttribute("opacity", 0);
+      }
+    }
+
+    let html = `<div class="es-tip-title">${tipTimeLabel(t)}</div>`;
+    if (t === -1) {
+      html += `<div class="es-tip-row" style="font-style: italic;">Reference period (estimates set to zero)</div>`;
+    } else if (active === null) {
+      for (const s of series) {
+        const p = s.points.find(pt => pt.t === t);
+        if (!p) continue;
+        html += `<div class="es-tip-multi"><span class="es-tip-swatch" style="background:${s.color}"></span><span class="es-tip-name" style="color:${s.color}">${s.label}</span><span class="es-tip-num">${tipFmt(p.coef)} pp</span></div>`;
+      }
+    } else {
+      const s = series.find(ss => ss.key === active);
+      const p = s.points.find(pt => pt.t === t);
+      if (p) {
+        html += `<div class="es-tip-row" style="color:${s.color}; font-weight: 500;">${s.label}</div>`;
+        html += `<div class="es-tip-row">${tipFmt(p.coef)} pp (95% CI: ${tipFmt(p.lo)} to ${tipFmt(p.hi)})</div>`;
+      }
+    }
+    tip.innerHTML = html;
+
+    const wrap = svg.parentElement;
+    const wrapRect = wrap.getBoundingClientRect();
+    const tipRect = tip.getBoundingClientRect();
+    const tipW = tipRect.width || 220;
+    const tipH = tipRect.height || 80;
+    const xRelative = clientX - wrapRect.left;
+    const yRelative = clientY - wrapRect.top;
+    let left = xRelative + 14;
+    let top = yRelative - tipH - 8;
+    if (left + tipW > wrapRect.width - 8) left = xRelative - 14 - tipW;
+    if (left < 8) left = 8;
+    if (top < 4) top = yRelative + 16;
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+    tip.style.opacity = 1;
+  }
+
+  function hideOverlay() {
+    guide.setAttribute("opacity", 0);
+    for (const fd of focusDots) fd.el.setAttribute("opacity", 0);
+    tip.style.opacity = 0;
+  }
+
+  overlay.addEventListener("pointermove", (e) => {
+    const t = snapT(e.clientX);
+    showAtT(t, e.clientX, e.clientY);
+  });
+  overlay.addEventListener("pointerleave", hideOverlay);
+
+  overlay.addEventListener("click", (e) => {
+    const t = snapT(e.clientX);
+    if (t === -1) return;
+    const vb = clientToViewBox(e.clientX, e.clientY);
+    let closestKey = null, closestDist = Infinity;
+    for (const s of series) {
+      const p = s.points.find(pt => pt.t === t);
+      if (!p) continue;
+      const dist = Math.abs(vb.y - ys(p.coef));
+      if (dist < closestDist) { closestDist = dist; closestKey = s.key; }
+    }
+    if (closestKey) {
+      const s = series.find(ss => ss.key === closestKey);
+      const p = s.points.find(pt => pt.t === t);
+      if (p) updateReadout(s, p);
+      setActive(closestKey);
+    }
+  });
 }
 
 function setActive(key) {
