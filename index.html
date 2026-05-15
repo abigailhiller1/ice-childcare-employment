@@ -59,11 +59,29 @@
   .es-tip-title { font-weight: 500; margin-bottom: 3px; color: #0f172a; }
   .es-tip-row { color: #475569; font-variant-numeric: tabular-nums; }
   .es-dot { cursor: pointer; }
+  .es-readout {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-left: 3px solid var(--readout-color, #cbd5e1);
+    border-radius: 2px;
+    font-size: 13px; line-height: 1.5;
+    color: #475569;
+    min-height: 48px;
+  }
+  .es-readout-title { font-weight: 500; color: #0f172a; margin-bottom: 2px; }
+  .es-readout-value { font-variant-numeric: tabular-nums; }
+  .es-readout-placeholder { color: #94a3b8; font-style: italic; }
   .es-note {
     font-size: 12px; color: #64748b; line-height: 1.55;
     margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9;
   }
   .es-source { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+  @media (hover: none) {
+    .es-tip { display: none !important; }
+    .es-readout { display: block; }
+  }
   @media (max-width: 500px) {
     body { padding: 14px 12px; font-size: 13px; }
     .es-title { font-size: 17px; }
@@ -88,6 +106,10 @@
   <div class="es-svg-box">
     <svg id="es-svg" viewBox="0 0 680 380" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
     <div class="es-tip" id="es-tip"></div>
+  </div>
+
+  <div class="es-readout" id="es-readout" aria-live="polite">
+    <div class="es-readout-placeholder">Tap a point to see its value</div>
   </div>
 
   <div class="es-note">
@@ -164,6 +186,29 @@ function el(tag, attrs, text) {
   for (const k in attrs) e.setAttribute(k, attrs[k]);
   if (text != null) e.textContent = text;
   return e;
+}
+
+function tipTimeLabel(t) {
+  if (t === 0) return "at inauguration";
+  if (t === -9) return "9 or more months before inauguration";
+  const abs = Math.abs(t);
+  const word = abs === 1 ? "month" : "months";
+  return t > 0
+    ? `${abs} ${word} after inauguration`
+    : `${abs} ${word} before inauguration`;
+}
+
+function tipFmt(v) {
+  return (v * 100).toFixed(2).replace(/^-/, "\u2212");
+}
+
+const readoutEl = document.getElementById("es-readout");
+function updateReadout(s, p) {
+  if (!readoutEl) return;
+  readoutEl.style.setProperty("--readout-color", s.color);
+  readoutEl.innerHTML =
+    `<div class="es-readout-title">${s.label} \u00b7 ${tipTimeLabel(p.t)}</div>` +
+    `<div class="es-readout-value">${tipFmt(p.coef)} pp (95% CI: ${tipFmt(p.lo)} to ${tipFmt(p.hi)})</div>`;
 }
 
 function render() {
@@ -266,9 +311,8 @@ function render() {
         fill: s.color, opacity: op, class: "es-dot"
       });
       dot.addEventListener("mouseenter", () => {
-        tip.innerHTML = `<div class="es-tip-title">${s.label} · month ${p.t}</div>
-          <div class="es-tip-row">Estimate: ${(p.coef * 100).toFixed(2)} pp</div>
-          <div class="es-tip-row">95% CI: [${(p.lo * 100).toFixed(2)}, ${(p.hi * 100).toFixed(2)}] pp</div>`;
+        tip.innerHTML = `<div class="es-tip-title">${s.label} \u00b7 ${tipTimeLabel(p.t)}</div>
+          <div class="es-tip-row">${tipFmt(p.coef)} pp (95% CI: ${tipFmt(p.lo)} to ${tipFmt(p.hi)})</div>`;
         const wrap = svg.parentElement;
         const wrapRect = wrap.getBoundingClientRect();
         const svgRect = svg.getBoundingClientRect();
@@ -276,12 +320,25 @@ function render() {
         const scaleY = svgRect.height / H;
         const cx = xs(p.t) * scaleX + (svgRect.left - wrapRect.left);
         const cy = ys(p.coef) * scaleY + (svgRect.top - wrapRect.top);
-        tip.style.left = (cx + 12) + "px";
-        tip.style.top = (cy - 56) + "px";
+        const tipRect = tip.getBoundingClientRect();
+        const tipW = tipRect.width || 200;
+        const tipH = tipRect.height || 56;
+        const containerW = wrapRect.width;
+        let left = cx + 12;
+        let top = cy - tipH - 4;
+        if (left + tipW > containerW - 8) left = cx - 12 - tipW;
+        if (left < 8) left = 8;
+        if (top < 4) top = cy + 16;
+        tip.style.left = left + "px";
+        tip.style.top = top + "px";
         tip.style.opacity = 1;
+        updateReadout(s, p);
       });
       dot.addEventListener("mouseleave", () => { tip.style.opacity = 0; });
-      dot.addEventListener("click", () => setActive(s.key));
+      dot.addEventListener("click", () => {
+        updateReadout(s, p);
+        setActive(s.key);
+      });
       svg.appendChild(dot);
     }
     if (active === s.key || active === null) {
