@@ -47,6 +47,35 @@
     display: inline-block; width: 20px; height: 2px;
     background: var(--c); flex-shrink: 0;
   }
+  .es-legend-cell {
+    display: inline-flex; align-items: center; gap: 1px;
+  }
+  .es-info-btn {
+    background: none; border: none; padding: 4px 4px;
+    margin-left: -2px; cursor: pointer;
+    color: #94a3b8; line-height: 0;
+    border-radius: 2px;
+    transition: color 0.12s;
+  }
+  .es-info-btn:hover, .es-info-btn[aria-expanded="true"] { color: #475569; }
+  .es-info-btn:focus-visible { outline: 2px solid #00356B; outline-offset: 1px; }
+  .es-def-popover {
+    position: absolute; z-index: 20;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-left: 3px solid var(--def-color, #cbd5e1);
+    border-radius: 2px;
+    padding: 8px 10px;
+    font-size: 12.5px; line-height: 1.5;
+    color: #475569;
+    max-width: 260px; min-width: 200px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    pointer-events: none;
+  }
+  .es-def-popover-title {
+    font-weight: 500; color: var(--def-color, #0f172a);
+    margin-bottom: 2px; font-size: 12.5px;
+  }
   .es-svg-box { position: relative; width: 100%; }
   .es-svg-box svg { width: 100%; height: auto; display: block; overflow: visible; }
   .es-tip {
@@ -85,11 +114,6 @@
   .es-readout-title { font-weight: 500; color: #0f172a; margin-bottom: 2px; }
   .es-readout-value { font-variant-numeric: tabular-nums; }
   .es-readout-placeholder { color: #94a3b8; font-style: italic; }
-  .es-note {
-    font-size: 12px; color: #64748b; line-height: 1.55;
-    margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9;
-  }
-  .es-source { font-size: 11px; color: #94a3b8; margin-top: 8px; }
   @media (hover: none) {
     .es-tip { display: none !important; }
     .es-readout { display: block; }
@@ -109,11 +133,25 @@
   <div class="es-title">Change in foreign-born childcare employment, by setting</div>
 
   <div class="es-legend" role="group" aria-label="Select a childcare setting to highlight">
-    <button class="es-legend-item" data-key="any_cc2" style="--c: #6F6F73"><span class="es-rule"></span>Any Childcare</button>
-    <button class="es-legend-item active" data-key="center_cc" style="--c: #00356B"><span class="es-rule"></span>Center-Based Care</button>
-    <button class="es-legend-item" data-key="home_cc" style="--c: #B58A2E"><span class="es-rule"></span>Home-Based Care</button>
-    <button class="es-legend-item" data-key="private_cc" style="--c: #9B2335"><span class="es-rule"></span>Private Care</button>
+    <span class="es-legend-cell">
+      <button class="es-legend-item" data-key="any_cc2" style="--c: #6F6F73"><span class="es-rule"></span>Any Childcare</button>
+      <button class="es-info-btn" type="button" aria-label="About Any Childcare" data-def-key="any_cc2"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="4.6" r="0.9" fill="currentColor"/><rect x="7.3" y="6.8" width="1.4" height="5.4" rx="0.6" fill="currentColor"/></svg></button>
+    </span>
+    <span class="es-legend-cell">
+      <button class="es-legend-item active" data-key="center_cc" style="--c: #00356B"><span class="es-rule"></span>Center-Based Care</button>
+      <button class="es-info-btn" type="button" aria-label="About Center-Based Care" data-def-key="center_cc"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="4.6" r="0.9" fill="currentColor"/><rect x="7.3" y="6.8" width="1.4" height="5.4" rx="0.6" fill="currentColor"/></svg></button>
+    </span>
+    <span class="es-legend-cell">
+      <button class="es-legend-item" data-key="home_cc" style="--c: #B58A2E"><span class="es-rule"></span>Home-Based Care</button>
+      <button class="es-info-btn" type="button" aria-label="About Home-Based Care" data-def-key="home_cc"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="4.6" r="0.9" fill="currentColor"/><rect x="7.3" y="6.8" width="1.4" height="5.4" rx="0.6" fill="currentColor"/></svg></button>
+    </span>
+    <span class="es-legend-cell">
+      <button class="es-legend-item" data-key="private_cc" style="--c: #9B2335"><span class="es-rule"></span>Private Care</button>
+      <button class="es-info-btn" type="button" aria-label="About Private Care" data-def-key="private_cc"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="4.6" r="0.9" fill="currentColor"/><rect x="7.3" y="6.8" width="1.4" height="5.4" rx="0.6" fill="currentColor"/></svg></button>
+    </span>
   </div>
+
+  <div class="es-def-popover" id="es-def-popover" role="tooltip" hidden></div>
 
   <div class="es-svg-box">
     <svg id="es-svg" viewBox="0 0 680 380" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
@@ -122,10 +160,6 @@
 
   <div class="es-readout" id="es-readout" aria-live="polite">
     <div class="es-readout-placeholder">Tap a point to see its value</div>
-  </div>
-
-  <div class="es-note">
-    Each point is the estimated change in employment probability for foreign-born women per 1 SD increase in state-level ICE enforcement intensity. Month 0 is February 2025, the first full month after Trump's inauguration; month -1 (January 2025) is the omitted reference period. The earliest bin consolidates all leads at month -9 or earlier. Shaded band = 95% confidence interval for the highlighted setting.
   </div>
 </div>
 
@@ -456,6 +490,68 @@ function setActive(key) {
 
 document.querySelectorAll(".es-legend-item").forEach(pill => {
   pill.addEventListener("click", () => setActive(pill.dataset.key));
+});
+
+const defs = {
+  any_cc2: { title: "Any Childcare", color: "#6F6F73", text: "All four settings combined." },
+  center_cc: { title: "Center-Based Care", color: "#00356B", text: "Licensed daycare centers and preschools. These workplaces have licensing requirements, payroll reporting, and regular interaction with regulators and parents." },
+  home_cc: { title: "Home-Based Care", color: "#B58A2E", text: "Self-employed caregivers operating out of their own homes. Smaller scale than centers, and somewhat insulated from public visibility." },
+  private_cc: { title: "Private Care", color: "#9B2335", text: "Nannies and babysitters working in individual households. The least visible to authorities, organized through informal arrangements." }
+};
+
+const defPopover = document.getElementById("es-def-popover");
+function showDef(btn) {
+  const key = btn.dataset.defKey;
+  const d = defs[key];
+  if (!d) return;
+  defPopover.style.setProperty("--def-color", d.color);
+  defPopover.innerHTML = `<div class="es-def-popover-title">${d.title}</div>${d.text}`;
+  defPopover.hidden = false;
+
+  const wrap = document.querySelector(".es-wrap");
+  const wrapRect = wrap.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+  const popRect = defPopover.getBoundingClientRect();
+  const popW = popRect.width;
+  const popH = popRect.height;
+  let left = btnRect.left - wrapRect.left + btnRect.width / 2 - popW / 2;
+  let top = btnRect.bottom - wrapRect.top + 6;
+  if (left + popW > wrapRect.width - 4) left = wrapRect.width - popW - 4;
+  if (left < 4) left = 4;
+  defPopover.style.left = left + "px";
+  defPopover.style.top = top + "px";
+}
+function hideDef() {
+  defPopover.hidden = true;
+}
+
+document.querySelectorAll(".es-info-btn").forEach(btn => {
+  btn.addEventListener("mouseenter", () => showDef(btn));
+  btn.addEventListener("mouseleave", hideDef);
+  btn.addEventListener("focus", () => showDef(btn));
+  btn.addEventListener("blur", hideDef);
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (defPopover.hidden || defPopover.dataset.openFor !== btn.dataset.defKey) {
+      showDef(btn);
+      defPopover.dataset.openFor = btn.dataset.defKey;
+    } else {
+      hideDef();
+      defPopover.dataset.openFor = "";
+    }
+  });
+});
+document.addEventListener("click", (e) => {
+  if (defPopover.hidden) return;
+  if (e.target.closest(".es-info-btn")) return;
+  hideDef();
+  defPopover.dataset.openFor = "";
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !defPopover.hidden) {
+    hideDef();
+    defPopover.dataset.openFor = "";
+  }
 });
 
 render();
